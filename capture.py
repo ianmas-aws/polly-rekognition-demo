@@ -1,5 +1,7 @@
 #!/usr/local/bin/python2.7
 
+# start your camera using photobooth for a preview and to warm up the camera before running this script
+
 import numpy as np
 import cv2
 import boto3
@@ -28,7 +30,8 @@ def take_photo(save=False):
 	speak("Please point your external webcam at the subject")
 	sleep(1)
 	speak("Taking a photo")
-	vidcap=cv2.VideoCapture()	
+	vidcap=cv2.VideoCapture()
+	# change the number of the camera that you open to cycle through different options if you have multiple connected cameras	
 	vidcap.open(0)
 	retval, image = vidcap.retrieve()
 	vidcap.release()
