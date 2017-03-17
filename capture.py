@@ -14,7 +14,7 @@ import inflect
 from time import sleep
 
 region = 'eu-west-1' # change this to switch to another AWS region
-colors = [ ['green', 0,255,0], ['blue', 255,0,0], ['red', 0,0,255], ['purple', 255,0,255], ['silver', 192,192,192] ]
+colors = [ ['green', 0,255,0], ['blue', 255,0,0], ['red', 0,0,255], ['purple', 255,0,255], ['silver', 192,192,192], ['cyan', 0,255,255], ['magenta', 255,0,255], ['orange', 255,99,71] ]
 
 
 polly = boto3.client("polly", region_name=region)
@@ -31,12 +31,13 @@ def take_photo(save=False):
 	sleep(1)
 	speak("Taking a photo")
 	vidcap=cv2.VideoCapture()
-	# change the number of the camera that you open to cycle through different options if you have multiple connected cameras	
-	vidcap.open(0)
+	# change the number of the camera that you open to cycle through different options if you have multiple connected cameras
+	vidcap.open(1)
+	sleep(1)
 	retval, image = vidcap.retrieve()
 	vidcap.release()
-	small = cv2.resize(image, (0,0), fx=0.75, fy=0.75) 
-	if save: 
+	small = cv2.resize(image, (0,0), fx=0.75, fy=0.75)
+	if save:
 		cv2.imwrite('image.png', small)
 		os.system('open -a Preview image.png')
 	retval, encoded_image = cv2.imencode('.png',small)
@@ -54,12 +55,12 @@ def read_image(filename):
 		    print "I/O error({0}): {1}".format(e.errno, e.strerror)
 		    exit(-1)
 
-# Provide a string and an optional voice attribute and play the streamed audio response 
+# Provide a string and an optional voice attribute and play the streamed audio response
 # Defaults to the Salli voice
 def speak(text_string, voice="Joanna"):
 	try:
 	    # Request speech synthesis
-	    response = polly.synthesize_speech(Text=text_string, 
+	    response = polly.synthesize_speech(Text=text_string,
 	    	TextType="text", OutputFormat="pcm", VoiceId=voice)
 	except (BotoCoreError, ClientError) as error:
 	    # The service returned an error, exit gracefully
@@ -77,7 +78,7 @@ def speak(text_string, voice="Joanna"):
 	    print("Could not stream audio")
 	    return(False)
 
-# Amazon Rekognition label detection 
+# Amazon Rekognition label detection
 def reko_detect_labels(image_bytes):
 	print "Calling Amazon Rekognition: detect_labels"
 #	speak("Detecting labels with Amazon Recognition")
@@ -133,9 +134,9 @@ def create_verbal_response_face(reko_response):
 
 	persons = len(reko_response['FaceDetails'])
 	if persons == 1:
-		mystring = "I can see one person. "
-	else: 
-		mystring = "I can see %d people. " % (persons)
+		mystring = "I can see one face. "
+	else:
+		mystring = "I can see %d faces. " % (persons)
 	i = 0
 	for mydict in reko_response['FaceDetails']:
 		# Boolean True|False values for these facial features
@@ -181,7 +182,7 @@ def create_verbal_response_face(reko_response):
 		top = mydict['BoundingBox']['Top']
 		width = mydict['BoundingBox']['Width']
 		i += 1
-		
+
 	return mystring
 
 def save_image_with_bounding_boxes(encoded_image, reko_response):
@@ -197,7 +198,7 @@ def save_image_with_bounding_boxes(encoded_image, reko_response):
 		width = mydict['BoundingBox']['Width']
 		# draw this bounding box
 		image = draw_bounding_box(image, image_width, image_height, width, height, top, left, colors[i])
-		i += 1 
+		i += 1
 	# write the image to a file
 	cv2.imwrite('face_bounding_boxes.jpg', image)
 	os.system('open -a Preview face_bounding_boxes.jpg')
@@ -243,5 +244,3 @@ if humans:
 	speak(faces_response_string)
 else:
 	print "No humans detected. Skipping facial recognition"
-	
-
