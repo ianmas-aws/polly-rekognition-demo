@@ -14,7 +14,7 @@ import inflect
 from time import sleep
 
 region = 'eu-west-1' # change this to switch to another AWS region
-colors = [ ['green', 0,255,0], ['blue', 255,0,0], ['red', 0,0,255], ['purple', 255,0,255], ['silver', 192,192,192], ['cyan', 0,255,255], ['magenta', 255,0,255], ['orange', 255,99,71] ]
+colors = [ ['green', 0,255,0], ['blue', 255,0,0], ['red', 0,0,255], ['purple', 255,0,255], ['silver', 192,192,192], ['cyan', 0,255,255], ['orange', 255,99,71], ['white', 255,255,255], ['black', 0,0,0] ]
 
 
 polly = boto3.client("polly", region_name=region)
@@ -133,6 +133,8 @@ def create_verbal_response_face(reko_response):
 	mystring = ""
 
 	persons = len(reko_response['FaceDetails'])
+	print "number of persons = ", persons
+
 	if persons == 1:
 		mystring = "I can see one face. "
 	else:
@@ -183,6 +185,9 @@ def create_verbal_response_face(reko_response):
 		width = mydict['BoundingBox']['Width']
 		i += 1
 
+		if i > 4:
+			break
+
 	return mystring
 
 def save_image_with_bounding_boxes(encoded_image, reko_response):
@@ -199,6 +204,8 @@ def save_image_with_bounding_boxes(encoded_image, reko_response):
 		# draw this bounding box
 		image = draw_bounding_box(image, image_width, image_height, width, height, top, left, colors[i])
 		i += 1
+		if i > 4:
+			break
 	# write the image to a file
 	cv2.imwrite('face_bounding_boxes.jpg', image)
 	os.system('open -a Preview face_bounding_boxes.jpg')
