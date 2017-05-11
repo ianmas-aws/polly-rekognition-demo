@@ -13,7 +13,7 @@ import pyaudio
 import inflect
 from time import sleep
 
-region = 'eu-west-1' # change this to switch to another AWS region
+region = 'us-east-1' # change this to switch to another AWS region
 colors = [ ['green', 0,255,0], ['blue', 255,0,0], ['red', 0,0,255], ['purple', 255,0,255], ['silver', 192,192,192], ['cyan', 0,255,255], ['orange', 255,99,71], ['white', 255,255,255], ['black', 0,0,0] ]
 
 
