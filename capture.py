@@ -32,7 +32,7 @@ def take_photo(save=False):
 	speak("Taking a photo")
 	vidcap=cv2.VideoCapture()
 	# change the number of the camera that you open to cycle through different options if you have multiple connected cameras
-	vidcap.open(1)
+	vidcap.open(0)
 	sleep(1)
 	retval, image = vidcap.retrieve()
 	vidcap.release()
@@ -192,7 +192,7 @@ def create_verbal_response_face(reko_response):
 
 def save_image_with_bounding_boxes(encoded_image, reko_response):
 	encoded_image=np.fromstring(encoded_image,np.uint8);
-	image = cv2.imdecode(encoded_image, cv2.CV_LOAD_IMAGE_COLOR)
+	image = cv2.imdecode(encoded_image, cv2.IMREAD_COLOR)
 	image_height, image_width = image.shape[:2]
 	i = 0
 	for mydict in reko_response['FaceDetails']:
