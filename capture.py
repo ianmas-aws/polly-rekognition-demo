@@ -1,4 +1,4 @@
-#!/usr/local/bin/python2.7
+#!/usr/local/bin/python3
 
 # start your camera using photobooth for a preview and to warm up the camera before running this script
 
@@ -52,7 +52,7 @@ def read_image(filename):
 		fin.close()
 		return encoded_image_bytes
 	except IOError as e:
-		    print "I/O error({0}): {1}".format(e.errno, e.strerror)
+		    print ("I/O error({0}): {1}".format(e.errno, e.strerror))
 		    exit(-1)
 
 # Provide a string and an optional voice attribute and play the streamed audio response
@@ -80,7 +80,7 @@ def speak(text_string, voice="Joanna"):
 
 # Amazon Rekognition label detection
 def reko_detect_labels(image_bytes):
-	print "Calling Amazon Rekognition: detect_labels"
+	print ("Calling Amazon Rekognition: detect_labels")
 #	speak("Detecting labels with Amazon Recognition")
 	response = reko.detect_labels(
 	    Image={
@@ -93,14 +93,14 @@ def reko_detect_labels(image_bytes):
 
 # rekognition facial detection
 def reko_detect_faces(image_bytes):
-	print "Calling Amazon Rekognition: detect_faces"
+	print ("Calling Amazon Rekognition: detect_faces")
 	response = reko.detect_faces(
 	    Image={
 	        'Bytes': image_bytes
 	    },
 	    Attributes=['ALL']
 	)
-	print json.dumps(response, sort_keys=True, indent=4)
+	print (json.dumps(response, sort_keys=True, indent=4))
 	return response
 
 # create verbal response describing the detected lables in the response from Rekognition
@@ -118,7 +118,7 @@ def create_verbal_response_labels(reko_response):
 			if mydict['Name'] == 'People':
 				humans = True
 				continue
-			print "%s\t(%.2f)" % (mydict['Name'], mydict['Confidence'])
+			print ("%s\t(%.2f)" % (mydict['Name'], mydict['Confidence']))
 			if i < labels:
 				newstring = "%s, " % (mydict['Name'].lower())
 				mystring = mystring + newstring
@@ -133,7 +133,7 @@ def create_verbal_response_face(reko_response):
 	mystring = ""
 
 	persons = len(reko_response['FaceDetails'])
-	print "number of persons = ", persons
+	print ("number of persons = ", persons)
 
 	if persons == 1:
 		mystring = "I can see one face. "
@@ -155,11 +155,11 @@ def create_verbal_response_face(reko_response):
 			he_she = 'he'
 		else:
 			he_she = 'she'
-		print "Person %d (%s):" % (i+1, colors[i][0])
-		print "\tGender: %s\t(%.2f)" % (mydict['Gender']['Value'], mydict['Gender']['Confidence'])
-		print "\tEyeglasses: %s\t(%.2f)" % (eyeglasses, mydict['Eyeglasses']['Confidence'])
-		print "\tSunglasses: %s\t(%.2f)" % (sunglasses, mydict['Sunglasses']['Confidence'])
-		print "\tSmile: %s\t(%.2f)" % (smile, mydict['Smile']['Confidence'])
+		print ("Person %d (%s):" % (i+1, colors[i][0]))
+		print ("\tGender: %s\t(%.2f)" % (mydict['Gender']['Value'], mydict['Gender']['Confidence']))
+		print ("\tEyeglasses: %s\t(%.2f)" % (eyeglasses, mydict['Eyeglasses']['Confidence']))
+		print ("\tSunglasses: %s\t(%.2f)" % (sunglasses, mydict['Sunglasses']['Confidence']))
+		print ("\tSmile: %s\t(%.2f)" % (smile, mydict['Smile']['Confidence']))
 		if eyeglasses == True and sunglasses == True:
 			mystring = mystring + "%s is wearing glasses. " % (he_she.capitalize(), )
 		elif eyeglasses == True and sunglasses == False:
@@ -171,12 +171,12 @@ def create_verbal_response_face(reko_response):
 		else:
 			true_false = 'is not'
 		mystring = mystring + "%s %s smiling. " % (he_she.capitalize(), true_false)
-		print "\tEmotions:"
+		print ("\tEmotions:")
 		j = 0
 		for emotion in mydict['Emotions']:
 			if j == 0:
 				mystring = mystring + "%s looks %s. " % (he_she.capitalize(), emotion['Type'].lower())
-			print "\t\t%s\t(%.2f)" % (emotion['Type'], emotion['Confidence'])
+			print ("\t\t%s\t(%.2f)" % (emotion['Type'], emotion['Confidence']))
 			j += 1
 		# Find bounding box for this face
 		height = mydict['BoundingBox']['Height']
@@ -230,24 +230,24 @@ def draw_bounding_box(cv_img, cv_img_width, cv_img_height, width, height, top, l
 if len(argv) == 1:
 	encoded_image = take_photo(save=True)
 elif len(argv) == 2:
-	print "opening image in file: ", argv[1]
+	print ("opening image in file: ", argv[1])
 	encoded_image=read_image(argv[1])
 else:
-	print "Use with no arguments to take a photo with the camera, or one argument to use a saved image"
+	print ("Use with no arguments to take a photo with the camera, or one argument to use a saved image")
 	exit(-1)
 
 labels=reko_detect_labels(encoded_image)
 humans, labels_response_string = create_verbal_response_labels(labels)
-print labels_response_string
+print (labels_response_string)
 speak(labels_response_string)
 
 if humans:
-	print "Detected Human: ", humans, "\n"
+	print ("Detected Human: ", humans, "\n")
 	reko_response = reko_detect_faces(encoded_image)
 	faces_response_string = create_verbal_response_face(reko_response)
 	save_image_with_bounding_boxes(encoded_image, reko_response)
-	print faces_response_string
+	print (faces_response_string)
 	sleep(1)
 	speak(faces_response_string)
 else:
-	print "No humans detected. Skipping facial recognition"
+	print ("No humans detected. Skipping facial recognition")
