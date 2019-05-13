@@ -19,23 +19,25 @@ colors = [ ['green', 0,255,0], ['blue', 255,0,0], ['red', 0,0,255], ['purple', 2
 
 polly = boto3.client("polly", region_name=region)
 reko = boto3.client('rekognition', region_name=region)
+translate = boto3.client('translate', region_name=region)
 p = inflect.engine()
-pya = pyaudio.PyAudio()
+pya = pyaudio.PyAudio()	
 
 
 # Take a photo with USB webcam
 # Set save to True if you want to save the image (in the current working directory)
 # and open Preview to see the image
 def take_photo(save=False):
-	speak("Please point your external webcam at the subject")
+	speak("Please point your camera at the subject")
 	sleep(1)
-	speak("Taking a photo")
-	vidcap=cv2.VideoCapture()
+	speak("Capturing image now")
+
 	# change the number of the camera that you open to cycle through different options if you have multiple connected cameras
-	vidcap.open(0)
+	vidcap=cv2.VideoCapture(0)
 	sleep(1)
-	retval, image = vidcap.retrieve()
-	vidcap.release()
+	retval, image = vidcap.read()
+	if retval != True:
+		raise ValueError("Can't read frame")
 	small = cv2.resize(image, (0,0), fx=0.75, fy=0.75)
 	if save:
 		cv2.imwrite('image.png', small)
@@ -54,6 +56,18 @@ def read_image(filename):
 	except IOError as e:
 		    print ("I/O error({0}): {1}".format(e.errno, e.strerror))
 		    exit(-1)
+
+# Translate English to French
+def translate_en_to_fr(text_string):
+	print("translation code goes here")
+	translate_response = translate.translate_text(
+		Text=text_string, 
+		SourceLanguageCode='en',
+		TargetLanguageCode='fr')
+	fr_text_string="en francais"
+	print(translate_response['TranslatedText'])
+	return translate_response['TranslatedText']
+
 
 # Provide a string and an optional voice attribute and play the streamed audio response
 # Defaults to the Salli voice
@@ -240,6 +254,10 @@ labels=reko_detect_labels(encoded_image)
 humans, labels_response_string = create_verbal_response_labels(labels)
 print (labels_response_string)
 speak(labels_response_string)
+sleep(1)
+speak("or in French")
+speak(translate_en_to_fr(labels_response_string), voice="Celine")
+
 
 if humans:
 	print ("Detected Human: ", humans, "\n")
@@ -247,7 +265,9 @@ if humans:
 	faces_response_string = create_verbal_response_face(reko_response)
 	save_image_with_bounding_boxes(encoded_image, reko_response)
 	print (faces_response_string)
-	sleep(1)
 	speak(faces_response_string)
+	sleep(1)
+	speak("or in French")
+	speak(translate_en_to_fr(labels_response_string), voice="Celine")
 else:
 	print ("No humans detected. Skipping facial recognition")
