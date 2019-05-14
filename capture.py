@@ -59,7 +59,6 @@ def read_image(filename):
 
 # Translate English to French
 def translate_en_to_fr(text_string):
-	print("translation code goes here")
 	translate_response = translate.translate_text(
 		Text=text_string, 
 		SourceLanguageCode='en',
@@ -268,6 +267,6 @@ if humans:
 	speak(faces_response_string)
 	sleep(1)
 	speak("or in French")
-	speak(translate_en_to_fr(labels_response_string), voice="Celine")
+	speak(translate_en_to_fr(faces_response_string), voice="Celine")
 else:
 	print ("No humans detected. Skipping facial recognition")
