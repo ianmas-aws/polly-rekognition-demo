@@ -33,7 +33,7 @@ def take_photo(save=False):
 	speak("Capturing image now")
 
 	# change the number of the camera that you open to cycle through different options if you have multiple connected cameras
-	vidcap=cv2.VideoCapture(0)
+	vidcap=cv2.VideoCapture(1)
 	sleep(1)
 	retval, image = vidcap.read()
 	if retval != True:
@@ -58,11 +58,11 @@ def read_image(filename):
 		    exit(-1)
 
 # Translate English to French
-def translate_en_to_fr(text_string):
+def translate_text(text_string, source_lang, target_lang):
 	translate_response = translate.translate_text(
 		Text=text_string, 
-		SourceLanguageCode='en',
-		TargetLanguageCode='fr')
+		SourceLanguageCode=source_lang,
+		TargetLanguageCode=target_lang)
 	fr_text_string="en francais"
 	print(translate_response['TranslatedText'])
 	return translate_response['TranslatedText']
@@ -255,7 +255,7 @@ print (labels_response_string)
 speak(labels_response_string)
 sleep(1)
 speak("or in French")
-speak(translate_en_to_fr(labels_response_string), voice="Celine")
+speak(translate_text(labels_response_string,'en', 'fr'), voice="Celine") # Vicki for German
 
 
 if humans:
@@ -267,6 +267,6 @@ if humans:
 	speak(faces_response_string)
 	sleep(1)
 	speak("or in French")
-	speak(translate_en_to_fr(faces_response_string), voice="Celine")
+	speak(translate_text(faces_response_string,'en', 'fr'), voice="Celine") # Vicki for German	
 else:
 	print ("No humans detected. Skipping facial recognition")
