@@ -57,13 +57,12 @@ def read_image(filename):
 		    print ("I/O error({0}): {1}".format(e.errno, e.strerror))
 		    exit(-1)
 
-# Translate English to French
+# Translate Text using Amazon Translate
 def translate_text(text_string, source_lang, target_lang):
 	translate_response = translate.translate_text(
 		Text=text_string, 
 		SourceLanguageCode=source_lang,
 		TargetLanguageCode=target_lang)
-	fr_text_string="en francais"
 	print(translate_response['TranslatedText'])
 	return translate_response['TranslatedText']
 
@@ -263,7 +262,7 @@ print (labels_response_string)
 speak(labels_response_string)
 sleep(1)
 speak("or in German")
-speak(translate_text(labels_response_string,'en', 'de'), voice="Vicki") # Vicki for German
+speak(translate_text(labels_response_string,'en', 'de'), voice="Vicki") # Vicki for German/Celine for French
 
 
 if humans:
@@ -275,6 +274,6 @@ if humans:
 	speak(faces_response_string)
 	sleep(1)
 	speak("or in German")
-	speak(translate_text(faces_response_string,'en', 'de'), voice="Vicki") # Vicki for German	
+	speak(translate_text(faces_response_string,'en', 'de'), voice="Vicki") # Vicki for German/Celine for French
 else:
 	print ("No humans detected. Skipping facial recognition")
