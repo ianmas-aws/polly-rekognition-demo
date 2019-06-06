@@ -142,6 +142,16 @@ def create_verbal_response_labels(reko_response):
 				humans = True
 	return humans, mystring
 
+def get_highest_emotion(emotions):
+	highest_emotion = ""
+	highest_score = 0
+	for pair in emotions:
+		if pair['Confidence'] > highest_score:
+			highest_score = pair['Confidence']
+			highest_emotion = pair['Type']
+	return(highest_emotion)
+	
+
 def create_verbal_response_face(reko_response):
 	mystring = ""
 
@@ -184,13 +194,11 @@ def create_verbal_response_face(reko_response):
 		else:
 			true_false = 'is not'
 		mystring = mystring + "%s %s smiling. " % (he_she.capitalize(), true_false)
-		print ("\tEmotions:")
 		j = 0
-		for emotion in mydict['Emotions']:
-			if j == 0:
-				mystring = mystring + "%s looks %s. " % (he_she.capitalize(), emotion['Type'].lower())
-			print ("\t\t%s\t(%.2f)" % (emotion['Type'], emotion['Confidence']))
-			j += 1
+
+		highest_emotion = get_highest_emotion(mydict['Emotions'])
+		mystring = mystring + "%s looks %s. " % (he_she.capitalize(), highest_emotion.lower())
+
 		# Find bounding box for this face
 		height = mydict['BoundingBox']['Height']
 		left = mydict['BoundingBox']['Left']
@@ -254,8 +262,8 @@ humans, labels_response_string = create_verbal_response_labels(labels)
 print (labels_response_string)
 speak(labels_response_string)
 sleep(1)
-speak("or in French")
-speak(translate_text(labels_response_string,'en', 'fr'), voice="Celine") # Vicki for German
+speak("or in German")
+speak(translate_text(labels_response_string,'en', 'de'), voice="Vicki") # Vicki for German
 
 
 if humans:
@@ -266,7 +274,7 @@ if humans:
 	print (faces_response_string)
 	speak(faces_response_string)
 	sleep(1)
-	speak("or in French")
-	speak(translate_text(faces_response_string,'en', 'fr'), voice="Celine") # Vicki for German	
+	speak("or in German")
+	speak(translate_text(faces_response_string,'en', 'de'), voice="Vicki") # Vicki for German	
 else:
 	print ("No humans detected. Skipping facial recognition")
